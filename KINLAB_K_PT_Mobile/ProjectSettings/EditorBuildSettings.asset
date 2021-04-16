@@ -1,0 +1,14 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 0
+    path: Assets/MLKIT/BlazePose/BlazePoseUpperBody.unity
+    guid: d950d4d838fef4617a05bdf13bad7f89
+  - enabled: 0
+    path: Assets/MLKIT/BlazePose/BlazePoseFullBody.unity
+    guid: 3abf2ff7d3acd4eda8d5014c1830c433
+  m_configObjects: {}

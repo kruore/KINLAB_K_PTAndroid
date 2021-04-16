@@ -1,3 +1,0 @@
-include ':unitylove'
-include ':app'
-rootProject.name = "KINLAB_K_PT_ANDROID"
