@@ -34,9 +34,13 @@ public sealed class BlazePoseSample : MonoBehaviour
     PoseLandmarkDetect poseLandmark;
 
 
-        //CHECK HUMAN BODY
+    //CHECK HUMAN BODY
     public GameObject humanbodyRoot;
     public GameObject[] humanbody;
+
+
+    //GM_DancePosManager;
+
 
 
     // CHECK OBJECT
@@ -56,7 +60,7 @@ public sealed class BlazePoseSample : MonoBehaviour
         // Init model
         string detectionPath = Path.Combine(Application.streamingAssetsPath, poseDetectionModelFile);
         string landmarkPath = Path.Combine(Application.streamingAssetsPath, poseLandmarkModelFile);
-        
+
         switch (mode)
         {
             case Mode.UpperBody:
@@ -79,12 +83,12 @@ public sealed class BlazePoseSample : MonoBehaviour
         {
             // 사용 가능한 카메라 로그
             Debug.Log("Available Webcam: " + devices[i].name + ((devices[i].isFrontFacing) ? "(Front)" : "(Back)"));
-        //    text01.text = ("Available Webcam Count = " + i.ToString());
+            //    text01.text = ("Available Webcam Count = " + i.ToString());
 
             // 전면 카메라인지 체크
             if (devices[i].isFrontFacing == true)
             {
-             //   text02.text = camName = devices[i].name + "i = " + i.ToString(); ;
+                //   text02.text = camName = devices[i].name + "i = " + i.ToString(); ;
                 camName = devices[i].name;
                 // 해당 카메라 선택
                 selectedCameraIndex = i;
@@ -108,9 +112,9 @@ public sealed class BlazePoseSample : MonoBehaviour
         humanbody = new GameObject[humanbodyRoot.transform.childCount];
 
         cancellationToken = this.GetCancellationTokenOnDestroy();
-        for(int i=0; i<humanbodyRoot.transform.childCount;i++)
+        for (int i = 0; i < humanbodyRoot.transform.childCount; i++)
         {
-           humanbody[i] = humanbodyRoot.transform.GetChild(i).gameObject;
+            humanbody[i] = humanbodyRoot.transform.GetChild(i).gameObject;
         }
 
     }
@@ -203,7 +207,6 @@ public sealed class BlazePoseSample : MonoBehaviour
             humanbody[i].transform.position = worldJoints[i];
         }
         var connections = poseLandmark.Connections;
-        Debug.Log("Count = " + worldJoints.Length);
         for (int i = 0; i < connections.Length; i += 2)
         {
             draw.Line3D(
@@ -211,6 +214,16 @@ public sealed class BlazePoseSample : MonoBehaviour
                 worldJoints[connections[i + 1]],
                 0.05f);
         }
+        if (GM_DancePosManager.instance.lineColor[0].color == Color.red)
+        {
+            for (int i = 0; i < GM_DancePosManager.instance.linecontainer.gameObject.transform.childCount; i++)
+            {
+                GM_DancePosManager.instance.lineColor[i].color = Color.green;
+            }
+        }
+        //lineColor
+
+
         draw.Apply();
     }
 
