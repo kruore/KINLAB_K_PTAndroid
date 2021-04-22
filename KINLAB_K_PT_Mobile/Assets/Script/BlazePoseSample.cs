@@ -101,6 +101,7 @@ public sealed class BlazePoseSample : MonoBehaviour
         //    isFrontFacing = false,
         //    kind = WebCamKind.WideAngle,
         //});
+
         webcamTexture = new WebCamTexture(camName, 1280, 720, 30);
         cameraView.texture = webcamTexture;
         webcamTexture.Play();
