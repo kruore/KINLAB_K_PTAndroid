@@ -102,7 +102,7 @@ public sealed class BlazePoseSample : MonoBehaviour
         //    kind = WebCamKind.WideAngle,
         //});
 
-        webcamTexture = new WebCamTexture(camName, 1280, 720, 30);
+        webcamTexture = new WebCamTexture(camName, 2280, 1080, 30);
         cameraView.texture = webcamTexture;
         webcamTexture.Play();
         Debug.Log($"Starting camera: {camName}");
@@ -148,7 +148,7 @@ public sealed class BlazePoseSample : MonoBehaviour
         if (landmarkResult == null || landmarkResult.score < 0.2f) return;
         DrawCropMatrix(poseLandmark.CropMatrix);
         DrawJoints(landmarkResult.joints);
-
+ 
     }
 
     void DrawFrame(PoseDetect.Result pose)
