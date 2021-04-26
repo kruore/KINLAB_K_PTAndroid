@@ -39,10 +39,6 @@ public sealed class BlazePoseSample : MonoBehaviour
     public GameObject[] humanbody;
 
 
-    //GM_DancePosManager;
-
-
-
     // CHECK OBJECT
     public GameObject trap;
 
@@ -61,19 +57,7 @@ public sealed class BlazePoseSample : MonoBehaviour
         string detectionPath = Path.Combine(Application.streamingAssetsPath, poseDetectionModelFile);
         string landmarkPath = Path.Combine(Application.streamingAssetsPath, poseLandmarkModelFile);
 
-        switch (mode)
-        {
-            case Mode.UpperBody:
-                poseDetect = new PoseDetectUpperBody(detectionPath);
-                poseLandmark = new PoseLandmarkDetectUpperBody(landmarkPath);
-                break;
-            case Mode.FullBody:
-                poseDetect = new PoseDetectFullBody(detectionPath);
-                poseLandmark = new PoseLandmarkDetectFullBody(landmarkPath);
-                break;
-            default:
-                throw new System.NotSupportedException($"Mode: {mode} is not supported");
-        }
+
         WebCamDevice[] devices = WebCamTexture.devices;
         string camName = string.Empty;
         // 사용할 카메라를 선택
@@ -101,8 +85,21 @@ public sealed class BlazePoseSample : MonoBehaviour
         //    isFrontFacing = false,
         //    kind = WebCamKind.WideAngle,
         //});
-
-        webcamTexture = new WebCamTexture(camName, 2280, 1080, 30);
+        switch (mode)
+        {
+            case Mode.UpperBody:
+                poseDetect = new PoseDetectUpperBody(detectionPath);
+                poseLandmark = new PoseLandmarkDetectUpperBody(landmarkPath);
+                webcamTexture = new WebCamTexture(camName, 2280, 1080, 30);
+                break;
+            case Mode.FullBody:
+                poseDetect = new PoseDetectFullBody(detectionPath);
+                poseLandmark = new PoseLandmarkDetectFullBody(landmarkPath);
+                webcamTexture = new WebCamTexture(camName, 1080, 2280, 30);
+                break;
+            default:
+                throw new System.NotSupportedException($"Mode: {mode} is not supported");
+        }
         cameraView.texture = webcamTexture;
         webcamTexture.Play();
         Debug.Log($"Starting camera: {camName}");
@@ -143,14 +140,13 @@ public sealed class BlazePoseSample : MonoBehaviour
         }
 
         if (poseResult == null || poseResult.score < 0f) return;
-        DrawFrame(poseResult);
+       // DrawFrame(poseResult);
 
         if (landmarkResult == null || landmarkResult.score < 0.2f) return;
-        DrawCropMatrix(poseLandmark.CropMatrix);
+      //  DrawCropMatrix(poseLandmark.CropMatrix);
         DrawJoints(landmarkResult.joints);
  
     }
-
     void DrawFrame(PoseDetect.Result pose)
     {
         Vector3 min = rtCorners[0];
@@ -191,7 +187,7 @@ public sealed class BlazePoseSample : MonoBehaviour
         Vector3 min = rtCorners[0];
         Vector3 max = rtCorners[2];
 
-        draw.color = Color.blue;
+       // draw.color = Color.blue;
 
         // Update world joints
         for (int i = 0; i < joints.Length; i++)
@@ -204,17 +200,17 @@ public sealed class BlazePoseSample : MonoBehaviour
         // Draw
         for (int i = 0; i < worldJoints.Length; i++)
         {
-            draw.Cube(worldJoints[i], 0.2f);
+        //    draw.Cube(worldJoints[i], 0.2f);
             humanbody[i].transform.position = worldJoints[i];
         }
-        var connections = poseLandmark.Connections;
-        for (int i = 0; i < connections.Length; i += 2)
-        {
-            draw.Line3D(
-                worldJoints[connections[i]],
-                worldJoints[connections[i + 1]],
-                0.05f);
-        }
+        //var connections = poseLandmark.Connections;
+        //for (int i = 0; i < connections.Length; i += 2)
+        //{
+        //    draw.Line3D(
+        //        worldJoints[connections[i]],
+        //        worldJoints[connections[i + 1]],
+        //        0.05f);
+        //}
         if (GM_DancePosManager.instance.lineColor[0].color == Color.red)
         {
             for (int i = 0; i < GM_DancePosManager.instance.linecontainer.gameObject.transform.childCount; i++)
@@ -224,10 +220,8 @@ public sealed class BlazePoseSample : MonoBehaviour
         }
         //lineColor
 
-
         draw.Apply();
     }
-
     void Invoke()
     {
         poseDetect.Invoke(webcamTexture);
@@ -270,7 +264,6 @@ public sealed class BlazePoseSample : MonoBehaviour
         {
             debugView.texture = poseLandmark.inputTex;
         }
-
         return true;
     }
 }
