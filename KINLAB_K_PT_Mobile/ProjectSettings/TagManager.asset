@@ -10,6 +10,8 @@ TagManager:
   - Pelvis
   - RightHand
   - LeftHand
+  - RightElbow
+  - LeftElbow
   layers:
   - Default
   - TransparentFX

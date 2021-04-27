@@ -149,9 +149,9 @@ namespace TensorFlowLite
             // No result
             if (results.Count == 0)
             {
-                    for (int i = 0; i < GM_DancePosManager.instance.linecontainer.gameObject.transform.childCount; i++)
+                    for (int i = 0; i < GM_PosManager.instance.linecontainer.gameObject.transform.childCount; i++)
                     {
-                        GM_DancePosManager.instance.lineColor[i].color = Color.red;
+                        GM_PosManager.instance.lineColor[i].color = Color.red;
                     }
 
                 return Result.Negative;

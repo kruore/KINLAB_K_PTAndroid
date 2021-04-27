@@ -211,11 +211,11 @@ public sealed class BlazePoseSample : MonoBehaviour
         //        worldJoints[connections[i + 1]],
         //        0.05f);
         //}
-        if (GM_DancePosManager.instance.lineColor[0].color == Color.red)
+        if (GM_PosManager.instance.lineColor[0].color == Color.red)
         {
-            for (int i = 0; i < GM_DancePosManager.instance.linecontainer.gameObject.transform.childCount; i++)
+            for (int i = 0; i < GM_PosManager.instance.linecontainer.gameObject.transform.childCount; i++)
             {
-                GM_DancePosManager.instance.lineColor[i].color = Color.green;
+                GM_PosManager.instance.lineColor[i].color = Color.green;
             }
         }
         //lineColor
