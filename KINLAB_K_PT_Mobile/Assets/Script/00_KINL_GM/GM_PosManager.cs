@@ -29,6 +29,15 @@ public class GM_PosManager : MonoBehaviour
     public Text timerText;
     public float waitTimer = 0.0f;
     public Text waitTimerText;
+    public float playTimer = 0.0f;
+    public Text playTimerText;
+
+
+    public int comboCounter;
+    public bool isCombo;
+
+    public bool isBunningTime;
+    public Text burnning;
 
     public GameObject Pos01;
     public GameObject Pos02;
@@ -89,6 +98,8 @@ public class GM_PosManager : MonoBehaviour
         }
         initallizePos();
         timer = 3.0f;
+        playTimer = 100.0f;
+        isCombo = false;
     }
     public void initallizePos()
     {
@@ -184,6 +195,7 @@ public class GM_PosManager : MonoBehaviour
             isRightElbow = false;
             isLeftElbow = false;
             IsSetPos = true;
+            isCombo = true;
             return IsSetPos = true;
         }
         else
@@ -196,11 +208,36 @@ public class GM_PosManager : MonoBehaviour
     {
         DancsPosActive();
         AllPlaced();
-        if (IsSetPos == true && waitTimer < 0)
+        if (IsSetPos == true && waitTimer < 0 && !isBunningTime)
         {
             waitTimer = 2.0f;
             timer = 3.0f;
             score++;
+            comboCounter++;
+            Debug.Log("Score!!");
+            scoreText.text = score.ToString();
+            if (dance != Dance.Pos04)
+            {
+                dance++;
+            }
+            else
+            {
+                dance = Dance.Pos01;
+            }
+            if (comboCounter == 3)
+            {
+                isBunningTime = true;
+                burnning.gameObject.SetActive(true);
+                waitTimer = 1.0f;
+                timer = 1.0f;
+            }
+        }
+        else if (IsSetPos == true && waitTimer < 0 && isBunningTime)
+        {
+            waitTimer = 1.0f;
+            timer = 1.0f;
+            score++;
+            comboCounter++;
             Debug.Log("Score!!");
             scoreText.text = score.ToString();
             if (dance != Dance.Pos04)
@@ -212,11 +249,7 @@ public class GM_PosManager : MonoBehaviour
                 dance = Dance.Pos01;
             }
         }
-        timer -= Time.deltaTime;
-        waitTimer -= Time.deltaTime;
-        timerText.text = timer.ToString();
-        waitTimerText.text = waitTimer.ToString();
-        if (timer < 0 && waitTimer <0)
+        if (IsSetPos == false && waitTimer < 0)
         {
             waitTimer = 2.0f;
             timer = 3.0f;
@@ -228,6 +261,19 @@ public class GM_PosManager : MonoBehaviour
             {
                 dance = Dance.Pos01;
             }
+            isCombo = false;
+            comboCounter = 0;
+            isBunningTime = false;
+            burnning.gameObject.SetActive(false);
         }
+        timer -= Time.deltaTime;
+        waitTimer -= Time.deltaTime;
+        playTimer -= Time.deltaTime;
+        if (playTimer < 0)
+        {
+            Time.timeScale = 0.0f;
+        }
+        timerText.text = timer.ToString();
+        waitTimerText.text = waitTimer.ToString();
     }
 }
