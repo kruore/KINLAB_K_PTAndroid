@@ -7,12 +7,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-public class TargetPosition
-{
-    Vector3 pos;
-    Vector3 rot;
-}
-
 public enum Dance
 {
     Pos01, Pos02, Pos03, Pos04
@@ -72,8 +66,11 @@ public class GM_PosManager : MonoBehaviour
 
     [Header("score")]
     public Text scoreText;
-    public int score;
+    public int score { get { return _score * 100; } set { _score = value;} }
+    public int _score;
 
+    public Color collectColor =new Color(0, 1, 0, 0.7f);
+    public Color failColor = new Color(1, 0, 0, 0.7f);
     private void Awake()
     {
         if (instance == null)
@@ -204,26 +201,68 @@ public class GM_PosManager : MonoBehaviour
         }
     }
 
+    public Dance RandomPos()
+    {
+        int CurrntPos = dance.GetHashCode();
+        int RandomDancePos = Random.Range(0, 4);
+        Debug.Log(RandomDancePos.ToString());
+
+        while(RandomDancePos == CurrntPos)
+        {
+            RandomDancePos = Random.Range(0,4);
+            Debug.Log("SameNumber");
+        }
+        switch(RandomDancePos)
+        {
+            case 0: dance = Dance.Pos01;
+                break;
+            case 1:
+                dance = Dance.Pos02;
+                break;
+            case 2:
+                dance = Dance.Pos03;
+                break;
+            case 3:
+                dance = Dance.Pos04;
+                break;
+        }
+        return dance;   
+    }
+
+    public void GetScore()
+    {
+        _score++;
+        comboCounter++;
+        Debug.Log("Score!!");
+        scoreText.text = "Score : " + score.ToString();
+    }
+
     public void Update()
     {
         DancsPosActive();
         AllPlaced();
+        if(IsSetPos)
+        {
+            Pos01.GetComponent<SpriteRenderer>().color = collectColor;
+            
+            Pos02.GetComponent<SpriteRenderer>().color = collectColor;
+            Pos03.GetComponent<SpriteRenderer>().color = collectColor;
+            Pos04.GetComponent<SpriteRenderer>().color = collectColor;
+        }
+        else
+        {
+            Pos01.GetComponent<SpriteRenderer>().color = failColor;
+            Pos02.GetComponent<SpriteRenderer>().color = failColor;
+            Pos03.GetComponent<SpriteRenderer>().color = failColor;
+            Pos04.GetComponent<SpriteRenderer>().color = failColor;
+        }
         if (IsSetPos == true && waitTimer < 0 && !isBunningTime)
         {
             waitTimer = 2.0f;
             timer = 3.0f;
-            score++;
-            comboCounter++;
-            Debug.Log("Score!!");
-            scoreText.text = score.ToString();
-            if (dance != Dance.Pos04)
-            {
-                dance++;
-            }
-            else
-            {
-                dance = Dance.Pos01;
-            }
+            GetScore();
+
+            //if Combo.equal(3)
             if (comboCounter == 3)
             {
                 isBunningTime = true;
@@ -231,36 +270,21 @@ public class GM_PosManager : MonoBehaviour
                 waitTimer = 1.0f;
                 timer = 1.0f;
             }
+            RandomPos();
         }
         else if (IsSetPos == true && waitTimer < 0 && isBunningTime)
         {
             waitTimer = 1.0f;
             timer = 1.0f;
-            score++;
-            comboCounter++;
-            Debug.Log("Score!!");
-            scoreText.text = score.ToString();
-            if (dance != Dance.Pos04)
-            {
-                dance++;
-            }
-            else
-            {
-                dance = Dance.Pos01;
-            }
+            GetScore();
+            RandomPos();
         }
+        // Didn't get Score
         if (IsSetPos == false && waitTimer < 0)
         {
             waitTimer = 2.0f;
             timer = 3.0f;
-            if (dance != Dance.Pos04)
-            {
-                dance++;
-            }
-            else
-            {
-                dance = Dance.Pos01;
-            }
+            RandomPos();
             isCombo = false;
             comboCounter = 0;
             isBunningTime = false;

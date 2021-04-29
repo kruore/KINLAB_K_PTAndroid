@@ -38,10 +38,6 @@ public sealed class BlazePoseSample : MonoBehaviour
     public GameObject humanbodyRoot;
     public GameObject[] humanbody;
 
-
-    // CHECK OBJECT
-    public GameObject trap;
-
     Vector3[] rtCorners = new Vector3[4]; // just cache for GetWorldCorners
     Vector3[] worldJoints;
     PrimitiveDraw draw;
@@ -50,7 +46,9 @@ public sealed class BlazePoseSample : MonoBehaviour
     UniTask<bool> task;
     CancellationToken cancellationToken;
 
-
+    public bool ColorLineDrow_DebugMode = false;
+    public Toggle ColorLineDrow_DebugerToggle;
+    public GameObject Drow_DebugLine;
     void Start()
     {
         // Init model
@@ -140,12 +138,24 @@ public sealed class BlazePoseSample : MonoBehaviour
         }
 
         if (poseResult == null || poseResult.score < 0f) return;
-       // DrawFrame(poseResult);
+
+        //if (ColorLineDrow_DebugMode)
+        //{
+        //  //  DrawFrame(poseResult);
+        //}
 
         if (landmarkResult == null || landmarkResult.score < 0.2f) return;
-      //  DrawCropMatrix(poseLandmark.CropMatrix);
-        DrawJoints(landmarkResult.joints);
- 
+        if (ColorLineDrow_DebugMode)
+        {
+            DrawFrame(poseResult);
+            DrawCropMatrix(poseLandmark.CropMatrix);
+            DrawJoints(landmarkResult.joints);
+        }
+        else
+        {
+            //  DrawCropMatrix(poseLandmark.CropMatrix);
+            DrawJoints(landmarkResult.joints);
+        }
     }
     void DrawFrame(PoseDetect.Result pose)
     {
@@ -153,6 +163,7 @@ public sealed class BlazePoseSample : MonoBehaviour
         Vector3 max = rtCorners[2];
 
         draw.color = Color.green;
+
         draw.Rect(MathTF.Lerp(min, max, pose.rect, true), 0.02f, min.z);
 
         foreach (var kp in pose.keypoints)
@@ -187,7 +198,7 @@ public sealed class BlazePoseSample : MonoBehaviour
         Vector3 min = rtCorners[0];
         Vector3 max = rtCorners[2];
 
-       // draw.color = Color.blue;
+        draw.color = Color.blue;
 
         // Update world joints
         for (int i = 0; i < joints.Length; i++)
@@ -200,17 +211,23 @@ public sealed class BlazePoseSample : MonoBehaviour
         // Draw
         for (int i = 0; i < worldJoints.Length; i++)
         {
-        //    draw.Cube(worldJoints[i], 0.2f);
+            if (ColorLineDrow_DebugMode)
+            {
+                draw.Cube(worldJoints[i], 0.2f);
+            }
             humanbody[i].transform.position = worldJoints[i];
         }
-        //var connections = poseLandmark.Connections;
-        //for (int i = 0; i < connections.Length; i += 2)
-        //{
-        //    draw.Line3D(
-        //        worldJoints[connections[i]],
-        //        worldJoints[connections[i + 1]],
-        //        0.05f);
-        //}
+        if (ColorLineDrow_DebugMode)
+        {
+            var connections = poseLandmark.Connections;
+            for (int i = 0; i < connections.Length; i += 2)
+            {
+                draw.Line3D(
+                    worldJoints[connections[i]],
+                    worldJoints[connections[i + 1]],
+                    0.05f);
+            }
+        }
         if (GM_PosManager.instance.lineColor[0].color == Color.red)
         {
             for (int i = 0; i < GM_PosManager.instance.linecontainer.gameObject.transform.childCount; i++)
@@ -265,5 +282,27 @@ public sealed class BlazePoseSample : MonoBehaviour
             debugView.texture = poseLandmark.inputTex;
         }
         return true;
+    }
+
+    public void Debuger_Switch()
+    {
+        if(!ColorLineDrow_DebugMode)
+        {
+            ColorLineDrow_DebugerToggle.isOn = true;
+            ColorLineDrow_DebugMode = true;
+            for(int i =0; i< Drow_DebugLine.GetComponent<GM_PosManager>().transform.childCount;i++)
+            {
+                Drow_DebugLine.GetComponent<GM_PosManager>().transform.GetChild(i).gameObject.GetComponent<MeshRenderer>().enabled =true;
+            }
+        }
+        else
+        {
+            ColorLineDrow_DebugerToggle.isOn = false;
+            ColorLineDrow_DebugMode = false;
+            for (int i = 0; i < Drow_DebugLine.GetComponent<GM_PosManager>().transform.childCount; i++)
+            {
+                Drow_DebugLine.GetComponent<GM_PosManager>().transform.GetChild(i).gameObject.GetComponent<MeshRenderer>().enabled = false;
+            }
+        }
     }
 }
