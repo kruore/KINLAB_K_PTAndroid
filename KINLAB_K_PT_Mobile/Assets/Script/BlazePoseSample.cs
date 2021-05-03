@@ -20,9 +20,18 @@ public sealed class BlazePoseSample : MonoBehaviour
         FullBody,
     }
 
+    public enum GameMode
+    {
+        BodyTracking,
+        TouchReaction,
+    }
+
+    public static BlazePoseSample instance;
+
     [SerializeField, FilePopup("*.tflite")] string poseDetectionModelFile = "coco_ssd_mobilenet_quant.tflite";
     [SerializeField, FilePopup("*.tflite")] string poseLandmarkModelFile = "coco_ssd_mobilenet_quant.tflite";
     [SerializeField] Mode mode = Mode.UpperBody;
+    [SerializeField] public GameMode gameMode = GameMode.BodyTracking;
     [SerializeField] RawImage cameraView = null;
     [SerializeField] RawImage debugView = null;
     [SerializeField] bool useLandmarkFilter = true;
@@ -49,8 +58,24 @@ public sealed class BlazePoseSample : MonoBehaviour
     public bool ColorLineDrow_DebugMode = false;
     public Toggle ColorLineDrow_DebugerToggle;
     public GameObject Drow_DebugLine;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(this.gameObject);
+            this.transform.position = new Vector3(0f, 0f, -10f);
+        }
+        else
+        {
+            Destroy(this.gameObject);
+        }
+        this.transform.position = new Vector3(0f, 0f, -10f);
+    }
     void Start()
     {
+
         // Init model
         string detectionPath = Path.Combine(Application.streamingAssetsPath, poseDetectionModelFile);
         string landmarkPath = Path.Combine(Application.streamingAssetsPath, poseLandmarkModelFile);
@@ -145,16 +170,69 @@ public sealed class BlazePoseSample : MonoBehaviour
         //}
 
         if (landmarkResult == null || landmarkResult.score < 0.2f) return;
-        if (ColorLineDrow_DebugMode)
+
+        switch (gameMode)
         {
-            DrawFrame(poseResult);
-            DrawCropMatrix(poseLandmark.CropMatrix);
-            DrawJoints(landmarkResult.joints);
-        }
-        else
-        {
-            //  DrawCropMatrix(poseLandmark.CropMatrix);
-            DrawJoints(landmarkResult.joints);
+            case GameMode.BodyTracking:
+                if (ColorLineDrow_DebugMode)
+                {
+                    DrawFrame(poseResult);
+                    DrawCropMatrix(poseLandmark.CropMatrix);
+                    DrawJoints(landmarkResult.joints);
+                    //lineColor
+                    if (GM_PosManager.instance.lineColor[0].color == Color.red)
+                    {
+                        for (int i = 0; i < GM_PosManager.instance.linecontainer.gameObject.transform.childCount; i++)
+                        {
+                            GM_PosManager.instance.lineColor[i].color = Color.green;
+                        }
+                    }
+                }
+                else
+                {
+                    //  DrawCropMatrix(poseLandmark.CropMatrix);
+                    DrawJoints(landmarkResult.joints);
+                    //lineColor
+                    if (GM_PosManager.instance.lineColor[0].color == Color.red)
+                    {
+                        for (int i = 0; i < GM_PosManager.instance.linecontainer.gameObject.transform.childCount; i++)
+                        {
+                            GM_PosManager.instance.lineColor[i].color = Color.green;
+                        }
+                    }
+                }
+                break;
+
+            case GameMode.TouchReaction:
+                if (ColorLineDrow_DebugMode)
+                {
+                    DrawFrame(poseResult);
+                    DrawCropMatrix(poseLandmark.CropMatrix);
+                    DrawJoints(landmarkResult.joints);
+                    if (GM_Touchreaction.instance.lineColor[0].color == Color.red)
+                    {
+                        for (int i = 0; i < GM_Touchreaction.instance.linecontainer.gameObject.transform.childCount; i++)
+                        {
+                            GM_Touchreaction.instance.lineColor[i].color = Color.green;
+                        }
+                    }
+
+                }
+                else
+                {
+                    //  DrawCropMatrix(poseLandmark.CropMatrix);
+                    DrawJoints(landmarkResult.joints);
+                    if (GM_Touchreaction.instance.lineColor[0].color == Color.red)
+                    {
+                        for (int i = 0; i < GM_Touchreaction.instance.linecontainer.gameObject.transform.childCount; i++)
+                        {
+                            GM_Touchreaction.instance.lineColor[i].color = Color.green;
+                        }
+                    }
+                }
+                break;
+            default:
+                throw new System.NotSupportedException($"Mode: {gameMode} is not supported");
         }
     }
     void DrawFrame(PoseDetect.Result pose)
@@ -228,14 +306,6 @@ public sealed class BlazePoseSample : MonoBehaviour
                     0.05f);
             }
         }
-        if (GM_PosManager.instance.lineColor[0].color == Color.red)
-        {
-            for (int i = 0; i < GM_PosManager.instance.linecontainer.gameObject.transform.childCount; i++)
-            {
-                GM_PosManager.instance.lineColor[i].color = Color.green;
-            }
-        }
-        //lineColor
 
         draw.Apply();
     }
@@ -286,23 +356,41 @@ public sealed class BlazePoseSample : MonoBehaviour
 
     public void Debuger_Switch()
     {
-        if(!ColorLineDrow_DebugMode)
+        switch(gameMode)
         {
-            ColorLineDrow_DebugerToggle.isOn = true;
-            ColorLineDrow_DebugMode = true;
-            for(int i =0; i< Drow_DebugLine.GetComponent<GM_PosManager>().transform.childCount;i++)
-            {
-                Drow_DebugLine.GetComponent<GM_PosManager>().transform.GetChild(i).gameObject.GetComponent<MeshRenderer>().enabled =true;
-            }
+            case GameMode.BodyTracking:
+                if (!ColorLineDrow_DebugMode)
+                {
+                    ColorLineDrow_DebugerToggle.isOn = true;
+                    ColorLineDrow_DebugMode = true;
+                    for (int i = 0; i < Drow_DebugLine.GetComponent<GM_PosManager>().transform.childCount; i++)
+                    {
+                        Drow_DebugLine.GetComponent<GM_PosManager>().transform.GetChild(i).gameObject.GetComponent<MeshRenderer>().enabled = true;
+                    }
+                }
+                else
+                {
+                    ColorLineDrow_DebugerToggle.isOn = false;
+                    ColorLineDrow_DebugMode = false;
+                    for (int i = 0; i < Drow_DebugLine.GetComponent<GM_PosManager>().transform.childCount; i++)
+                    {
+                        Drow_DebugLine.GetComponent<GM_PosManager>().transform.GetChild(i).gameObject.GetComponent<MeshRenderer>().enabled = false;
+                    }
+                }
+                break;
+            case GameMode.TouchReaction:
+                if (!ColorLineDrow_DebugMode)
+                {
+                    ColorLineDrow_DebugerToggle.isOn = true;
+                    ColorLineDrow_DebugMode = true;
+                }
+                else
+                {
+                    ColorLineDrow_DebugerToggle.isOn = false;
+                    ColorLineDrow_DebugMode = false;
+                }
+                break;
         }
-        else
-        {
-            ColorLineDrow_DebugerToggle.isOn = false;
-            ColorLineDrow_DebugMode = false;
-            for (int i = 0; i < Drow_DebugLine.GetComponent<GM_PosManager>().transform.childCount; i++)
-            {
-                Drow_DebugLine.GetComponent<GM_PosManager>().transform.GetChild(i).gameObject.GetComponent<MeshRenderer>().enabled = false;
-            }
-        }
+     
     }
 }

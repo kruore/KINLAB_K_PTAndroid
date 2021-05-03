@@ -2038,7 +2038,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Timer
+  m_Text: 'PlayTime :'
 --- !u!222 &743497085
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2343,7 +2343,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Timer
+  m_Text: 'CheckTime :'
 --- !u!222 &805322929
 CanvasRenderer:
   m_ObjectHideFlags: 0

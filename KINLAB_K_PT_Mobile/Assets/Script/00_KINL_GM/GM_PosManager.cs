@@ -26,7 +26,6 @@ public class GM_PosManager : MonoBehaviour
     public float playTimer = 0.0f;
     public Text playTimerText;
 
-
     public int comboCounter;
     public bool isCombo;
 
@@ -297,7 +296,8 @@ public class GM_PosManager : MonoBehaviour
         {
             Time.timeScale = 0.0f;
         }
-        timerText.text = timer.ToString();
+        //timerText.text = timer.ToString();
         waitTimerText.text = waitTimer.ToString();
+        playTimerText.text = playTimer.ToString();
     }
 }
