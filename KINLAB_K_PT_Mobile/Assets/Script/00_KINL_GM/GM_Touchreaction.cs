@@ -17,6 +17,9 @@ public class GM_Touchreaction : MonoBehaviour
 
     public Text restTimeText;
     public float restTime;
+    public int StopTimer;
+
+    public Vector3 tempPos;
 
 
     [Header("photo frame Color")]
@@ -44,13 +47,14 @@ public class GM_Touchreaction : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        StopTimer = 100;
         restTime = 100.0f;
         lineColor = new Image[linecontainer.transform.childCount];
         for (int i = 0; i < linecontainer.transform.childCount; i++)
         {
             lineColor[i] = linecontainer.gameObject.transform.GetChild(i).GetComponent<Image>();
         }
-        GM_ObjectPool.Instance.transform.GetChild(0).gameObject.SetActive(true);
+        NewTargetPosition();
     }
     public void GetScore()
     {
@@ -61,16 +65,35 @@ public class GM_Touchreaction : MonoBehaviour
         isTouch = false;
     }
 
+    public void NewTargetPosition()
+    {
+        var target = GM_ObjectPool.GetObject();
+        var scoreObject = GM_ObjectPool.GetScoreObject();
+        scoreObject.transform.position = tempPos;
+        target.gameObject.transform.position = new Vector3(Random.Range(-8.0f, 8.0f), Random.Range(-3.0f, 4.0f), -10.5f);
+        tempPos = target.transform.position;
+        StartCoroutine(ScoreExistTime(scoreObject.gameObject));
+    }
+    IEnumerator ScoreExistTime(GameObject obj)
+    {
+        yield return new WaitForSeconds(0.5f);
+        GM_ObjectPool.ReturnScoreObject(obj.GetComponent<ScorePopPref>());
+    }
+
     // Update is called once per frame
     void Update()
     {
         restTime -= Time.deltaTime;
-        restTimeText.text = restTime.ToString();
+        StopTimer = (int)restTime;
+        restTimeText.text = "Rest Time : " + StopTimer.ToString();
         if (isTouch)
         {
+            NewTargetPosition();
             GetScore();
-            GM_ObjectPool.Instance.transform.GetChild(0).gameObject.SetActive(true);
-            GM_ObjectPool.Instance.transform.GetChild(0).transform.position= new Vector3(Random.Range(-8.0f, 8.0f), Random.Range(-3.0f, 4.0f),-10.5f);
+        }
+        if (StopTimer == 0)
+        {
+            Time.timeScale = 0;
         }
     }
 }

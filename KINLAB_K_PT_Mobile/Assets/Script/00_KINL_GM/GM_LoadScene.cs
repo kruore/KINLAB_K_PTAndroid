@@ -9,6 +9,10 @@ public class GM_LoadScene : MonoBehaviour
     {
         SceneManager.LoadScene("MLKIT/BlazePose/BlazePoseUpperBody");
     }
+    public void LoadScene_K_PT_GameMode01()
+    {
+        SceneManager.LoadScene("MLKIT/BlazePose/TouchObject");
+    }
     public void LoadScene_K_PT_BodyTracking_FullBody()
     {
         SceneManager.LoadScene("MLKIT/BlazePose/BlazePose_High");
@@ -19,14 +23,14 @@ public class GM_LoadScene : MonoBehaviour
 #if UNITY_ANDROID_API
         if (Input.touchCount==2)
         {
-             LoadScene_K_PT_BodyTracking();
+            LoadScene_K_PT_GameMode01();
            // LoadScene_K_PT_BodyTracking_FullBody();
         }
 #endif
 #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.P))
         {
-            LoadScene_K_PT_BodyTracking();
+            LoadScene_K_PT_GameMode01();
            // LoadScene_K_PT_BodyTracking_FullBody();
         }
 #endif

@@ -2318,6 +2318,8 @@ MonoBehaviour:
   scoreText: {fileID: 502415164}
   restTimeText: {fileID: 805322928}
   restTime: 0
+  StopTimer: 0
+  tempPos: {x: 0, y: 0, z: 0}
   linecontainer: {fileID: 1138817577}
   lineColor:
   - {fileID: 0}
@@ -2338,6 +2340,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poolingObjectPrefab: {fileID: 6299266807638868573, guid: 5554b4aa1096cec4ebf61b43518c09b1,
+    type: 3}
+  poolingScorePrefeb: {fileID: 3474027308942769097, guid: 4521601b1f446d14ab049475f931b1a3,
     type: 3}
 --- !u!1001 &928764689
 PrefabInstance:
@@ -3665,8 +3669,8 @@ MonoBehaviour:
   poseLandmarkModelFile: mediapipe/pose_landmark_upper_body.tflite
   mode: 0
   gameMode: 1
-  cameraView: {fileID: 0}
-  debugView: {fileID: 0}
+  cameraView: {fileID: 2074584278}
+  debugView: {fileID: 1302103928}
   useLandmarkFilter: 1
   filterVelocityScale: 10
   runBackground: 0

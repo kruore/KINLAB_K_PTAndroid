@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/MLKIT/BlazePose/BlazePoseFullBody.unity
     guid: 3abf2ff7d3acd4eda8d5014c1830c433
+  - enabled: 1
+    path: Assets/MLKIT/BlazePose/TouchObject.unity
+    guid: 267320b4fdaa7c3498f5bc11372533cf
   m_configObjects: {}
