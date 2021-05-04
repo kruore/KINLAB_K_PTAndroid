@@ -25,7 +25,7 @@ namespace TensorFlowLite
                     ? tex2tensor.texture as Texture
                     : resizer.texture as Texture;
             }
-        } 
+        }
         public Material transformMat => resizer.material;
 
         public TextureResizer.ResizeOptions ResizeOptions
@@ -54,8 +54,7 @@ namespace TensorFlowLite
             resizer = new TextureResizer();
             resizeOptions = new TextureResizer.ResizeOptions()
             {
-                aspectMode = TextureResizer.AspectMode.Fit,
-                //aspectMode = TextureResizer.AspectMode.Fill,
+                aspectMode = TextureResizer.AspectMode.Fill,
                 rotationDegree = 0,
                 mirrorHorizontal = false,
                 mirrorVertical = false,

@@ -20,18 +20,9 @@ public sealed class BlazePoseSample : MonoBehaviour
         FullBody,
     }
 
-    public enum GameMode
-    {
-        BodyTracking,
-        TouchReaction,
-    }
-
-    public static BlazePoseSample instance;
-
     [SerializeField, FilePopup("*.tflite")] string poseDetectionModelFile = "coco_ssd_mobilenet_quant.tflite";
     [SerializeField, FilePopup("*.tflite")] string poseLandmarkModelFile = "coco_ssd_mobilenet_quant.tflite";
     [SerializeField] Mode mode = Mode.UpperBody;
-    [SerializeField] public GameMode gameMode = GameMode.BodyTracking;
     [SerializeField] RawImage cameraView = null;
     [SerializeField] RawImage debugView = null;
     [SerializeField] bool useLandmarkFilter = true;
@@ -47,6 +38,14 @@ public sealed class BlazePoseSample : MonoBehaviour
     public GameObject humanbodyRoot;
     public GameObject[] humanbody;
 
+
+    //GM_DancePosManager;
+
+
+
+    // CHECK OBJECT
+    public GameObject trap;
+
     Vector3[] rtCorners = new Vector3[4]; // just cache for GetWorldCorners
     Vector3[] worldJoints;
     PrimitiveDraw draw;
@@ -55,32 +54,26 @@ public sealed class BlazePoseSample : MonoBehaviour
     UniTask<bool> task;
     CancellationToken cancellationToken;
 
-    public bool ColorLineDrow_DebugMode = false;
-    public Toggle ColorLineDrow_DebugerToggle;
-    public GameObject Drow_DebugLine;
 
-    private void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(this.gameObject);
-            this.transform.position = new Vector3(0f, 0f, -10f);
-        }
-        else
-        {
-            Destroy(this.gameObject);
-        }
-        this.transform.position = new Vector3(0f, 0f, -10f);
-    }
     void Start()
     {
-
         // Init model
         string detectionPath = Path.Combine(Application.streamingAssetsPath, poseDetectionModelFile);
         string landmarkPath = Path.Combine(Application.streamingAssetsPath, poseLandmarkModelFile);
 
-
+        switch (mode)
+        {
+            case Mode.UpperBody:
+                poseDetect = new PoseDetectUpperBody(detectionPath);
+                poseLandmark = new PoseLandmarkDetectUpperBody(landmarkPath);
+                break;
+            case Mode.FullBody:
+                poseDetect = new PoseDetectFullBody(detectionPath);
+                poseLandmark = new PoseLandmarkDetectFullBody(landmarkPath);
+                break;
+            default:
+                throw new System.NotSupportedException($"Mode: {mode} is not supported");
+        }
         WebCamDevice[] devices = WebCamTexture.devices;
         string camName = string.Empty;
         // 사용할 카메라를 선택
@@ -108,21 +101,7 @@ public sealed class BlazePoseSample : MonoBehaviour
         //    isFrontFacing = false,
         //    kind = WebCamKind.WideAngle,
         //});
-        switch (mode)
-        {
-            case Mode.UpperBody:
-                poseDetect = new PoseDetectUpperBody(detectionPath);
-                poseLandmark = new PoseLandmarkDetectUpperBody(landmarkPath);
-                webcamTexture = new WebCamTexture(camName, 2280, 1080, 30);
-                break;
-            case Mode.FullBody:
-                poseDetect = new PoseDetectFullBody(detectionPath);
-                poseLandmark = new PoseLandmarkDetectFullBody(landmarkPath);
-                webcamTexture = new WebCamTexture(camName, 1080, 2280, 30);
-                break;
-            default:
-                throw new System.NotSupportedException($"Mode: {mode} is not supported");
-        }
+        webcamTexture = new WebCamTexture(camName, 1280, 720, 30);
         cameraView.texture = webcamTexture;
         webcamTexture.Play();
         Debug.Log($"Starting camera: {camName}");
@@ -163,85 +142,20 @@ public sealed class BlazePoseSample : MonoBehaviour
         }
 
         if (poseResult == null || poseResult.score < 0f) return;
-
-        //if (ColorLineDrow_DebugMode)
-        //{
-        //  //  DrawFrame(poseResult);
-        //}
+        DrawFrame(poseResult);
 
         if (landmarkResult == null || landmarkResult.score < 0.2f) return;
+        DrawCropMatrix(poseLandmark.CropMatrix);
+        DrawJoints(landmarkResult.joints);
 
-        switch (gameMode)
-        {
-            case GameMode.BodyTracking:
-                if (ColorLineDrow_DebugMode)
-                {
-                    DrawFrame(poseResult);
-                    DrawCropMatrix(poseLandmark.CropMatrix);
-                    DrawJoints(landmarkResult.joints);
-                    //lineColor
-                    if (GM_PosManager.instance.lineColor[0].color == Color.red)
-                    {
-                        for (int i = 0; i < GM_PosManager.instance.linecontainer.gameObject.transform.childCount; i++)
-                        {
-                            GM_PosManager.instance.lineColor[i].color = Color.green;
-                        }
-                    }
-                }
-                else
-                {
-                    //  DrawCropMatrix(poseLandmark.CropMatrix);
-                    DrawJoints(landmarkResult.joints);
-                    //lineColor
-                    if (GM_PosManager.instance.lineColor[0].color == Color.red)
-                    {
-                        for (int i = 0; i < GM_PosManager.instance.linecontainer.gameObject.transform.childCount; i++)
-                        {
-                            GM_PosManager.instance.lineColor[i].color = Color.green;
-                        }
-                    }
-                }
-                break;
-
-            case GameMode.TouchReaction:
-                if (ColorLineDrow_DebugMode)
-                {
-                    DrawFrame(poseResult);
-                    DrawCropMatrix(poseLandmark.CropMatrix);
-                    DrawJoints(landmarkResult.joints);
-                    if (GM_Touchreaction.instance.lineColor[0].color == Color.red)
-                    {
-                        for (int i = 0; i < GM_Touchreaction.instance.linecontainer.gameObject.transform.childCount; i++)
-                        {
-                            GM_Touchreaction.instance.lineColor[i].color = Color.green;
-                        }
-                    }
-
-                }
-                else
-                {
-                    //  DrawCropMatrix(poseLandmark.CropMatrix);
-                    DrawJoints(landmarkResult.joints);
-                    if (GM_Touchreaction.instance.lineColor[0].color == Color.red)
-                    {
-                        for (int i = 0; i < GM_Touchreaction.instance.linecontainer.gameObject.transform.childCount; i++)
-                        {
-                            GM_Touchreaction.instance.lineColor[i].color = Color.green;
-                        }
-                    }
-                }
-                break;
-            default:
-                throw new System.NotSupportedException($"Mode: {gameMode} is not supported");
-        }
     }
+
     void DrawFrame(PoseDetect.Result pose)
     {
         Vector3 min = rtCorners[0];
         Vector3 max = rtCorners[2];
 
         draw.color = Color.green;
-
         draw.Rect(MathTF.Lerp(min, max, pose.rect, true), 0.02f, min.z);
 
         foreach (var kp in pose.keypoints)
@@ -289,26 +203,30 @@ public sealed class BlazePoseSample : MonoBehaviour
         // Draw
         for (int i = 0; i < worldJoints.Length; i++)
         {
-            if (ColorLineDrow_DebugMode)
-            {
-                draw.Cube(worldJoints[i], 0.2f);
-            }
+            draw.Cube(worldJoints[i], 0.2f);
             humanbody[i].transform.position = worldJoints[i];
         }
-        if (ColorLineDrow_DebugMode)
+        var connections = poseLandmark.Connections;
+        for (int i = 0; i < connections.Length; i += 2)
         {
-            var connections = poseLandmark.Connections;
-            for (int i = 0; i < connections.Length; i += 2)
+            draw.Line3D(
+                worldJoints[connections[i]],
+                worldJoints[connections[i + 1]],
+                0.05f);
+        }
+        if (GM_DancePosManager.instance.lineColor[0].color == Color.red)
+        {
+            for (int i = 0; i < GM_DancePosManager.instance.linecontainer.gameObject.transform.childCount; i++)
             {
-                draw.Line3D(
-                    worldJoints[connections[i]],
-                    worldJoints[connections[i + 1]],
-                    0.05f);
+                GM_DancePosManager.instance.lineColor[i].color = Color.green;
             }
         }
+        //lineColor
+
 
         draw.Apply();
     }
+
     void Invoke()
     {
         poseDetect.Invoke(webcamTexture);
@@ -351,46 +269,7 @@ public sealed class BlazePoseSample : MonoBehaviour
         {
             debugView.texture = poseLandmark.inputTex;
         }
-        return true;
-    }
 
-    public void Debuger_Switch()
-    {
-        switch(gameMode)
-        {
-            case GameMode.BodyTracking:
-                if (!ColorLineDrow_DebugMode)
-                {
-                    ColorLineDrow_DebugerToggle.isOn = true;
-                    ColorLineDrow_DebugMode = true;
-                    for (int i = 0; i < Drow_DebugLine.GetComponent<GM_PosManager>().transform.childCount; i++)
-                    {
-                        Drow_DebugLine.GetComponent<GM_PosManager>().transform.GetChild(i).gameObject.GetComponent<MeshRenderer>().enabled = true;
-                    }
-                }
-                else
-                {
-                    ColorLineDrow_DebugerToggle.isOn = false;
-                    ColorLineDrow_DebugMode = false;
-                    for (int i = 0; i < Drow_DebugLine.GetComponent<GM_PosManager>().transform.childCount; i++)
-                    {
-                        Drow_DebugLine.GetComponent<GM_PosManager>().transform.GetChild(i).gameObject.GetComponent<MeshRenderer>().enabled = false;
-                    }
-                }
-                break;
-            case GameMode.TouchReaction:
-                if (!ColorLineDrow_DebugMode)
-                {
-                    ColorLineDrow_DebugerToggle.isOn = true;
-                    ColorLineDrow_DebugMode = true;
-                }
-                else
-                {
-                    ColorLineDrow_DebugerToggle.isOn = false;
-                    ColorLineDrow_DebugMode = false;
-                }
-                break;
-        }
-     
+        return true;
     }
 }
