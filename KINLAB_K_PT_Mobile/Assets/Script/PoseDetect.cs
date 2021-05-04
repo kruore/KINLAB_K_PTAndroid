@@ -149,9 +149,15 @@ namespace TensorFlowLite
             // No result
             if (results.Count == 0)
             {
-                    for (int i = 0; i < GM_DancePosManager.instance.linecontainer.gameObject.transform.childCount; i++)
+                if(BlazePoseSample.instance.gameMode==BlazePoseSample.GameMode.BodyTracking)
+                    for (int i = 0; i < GM_PosManager.instance.linecontainer.gameObject.transform.childCount; i++)
                     {
-                        GM_DancePosManager.instance.lineColor[i].color = Color.red;
+                        GM_PosManager.instance.lineColor[i].color = Color.red;
+                    }
+                if (BlazePoseSample.instance.gameMode == BlazePoseSample.GameMode.TouchReaction)
+                    for (int i = 0; i < GM_Touchreaction.instance.linecontainer.gameObject.transform.childCount; i++)
+                    {
+                        GM_Touchreaction.instance.lineColor[i].color = Color.red;
                     }
 
                 return Result.Negative;
