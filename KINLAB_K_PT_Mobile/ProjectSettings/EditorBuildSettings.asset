@@ -5,16 +5,29 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scene/00_LoadScene.unity
     guid: dad66fa30e95dd7419442c7dc3f283e1
-  - enabled: 1
+  - enabled: 0
     path: Assets/MLKIT/BlazePose/BlazePoseUpperBody.unity
     guid: d950d4d838fef4617a05bdf13bad7f89
   - enabled: 0
     path: Assets/MLKIT/BlazePose/BlazePoseFullBody.unity
     guid: 3abf2ff7d3acd4eda8d5014c1830c433
-  - enabled: 1
+  - enabled: 0
     path: Assets/MLKIT/BlazePose/TouchObject.unity
     guid: 267320b4fdaa7c3498f5bc11372533cf
-  m_configObjects: {}
+  - enabled: 1
+    path: Assets/00_KINLAB/01_Scene/20210501/00 KINL Experiment Title.unity
+    guid: 6d6f8dc40c127ea4094da2910b94f9f4
+  - enabled: 1
+    path: Assets/00_KINLAB/01_Scene/20210501/01 KINL Login.unity
+    guid: 931cef9614314f542830f4d80b7db1ca
+  - enabled: 1
+    path: Assets/00_KINLAB/01_Scene/20210501/02 KINL Home.unity
+    guid: 5a21e33c44fa2894c9d7819446359e45
+  m_configObjects:
+    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: c88e552011711d945b524b7be5cdb8e9,
+      type: 2}
+    UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 4fb258efe95b8f84d8da6897cba93056,
+      type: 2}
