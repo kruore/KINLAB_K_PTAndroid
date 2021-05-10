@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 public enum Dance
 {
     Pos01, Pos02, Pos03, Pos04
@@ -20,11 +21,17 @@ public class GM_PosManager : MonoBehaviour
     int CurrenDance = 1;
 
     public float timer = 0.0f;
-    public Text timerText;
+    public Text reactiontimerText;
     public float waitTimer = 0.0f;
     public Text waitTimerText;
     public float playTimer = 0.0f;
     public Text playTimerText;
+    public float checktime = 0.0f;
+
+    [Header("Panel")]
+    public GameObject gamePanel;
+    public GameObject gameEndPanel;
+    public bool bCheck=false;
 
     public int comboCounter;
     public bool isCombo;
@@ -65,10 +72,11 @@ public class GM_PosManager : MonoBehaviour
 
     [Header("score")]
     public Text scoreText;
-    public int score { get { return _score * 100; } set { _score = value;} }
+    public Text maxScore;
+    public int score { get { return _score * 100; } set { _score = value; } }
     public int _score;
 
-    public Color collectColor =new Color(0, 1, 0, 0.7f);
+    public Color collectColor = new Color(0, 1, 0, 0.7f);
     public Color failColor = new Color(1, 0, 0, 0.7f);
     private void Awake()
     {
@@ -94,7 +102,7 @@ public class GM_PosManager : MonoBehaviour
         }
         initallizePos();
         timer = 3.0f;
-        playTimer = 100.0f;
+        playTimer = 10.0f;
         isCombo = false;
     }
     public void initallizePos()
@@ -206,14 +214,15 @@ public class GM_PosManager : MonoBehaviour
         int RandomDancePos = Random.Range(0, 4);
         Debug.Log(RandomDancePos.ToString());
 
-        while(RandomDancePos == CurrntPos)
+        while (RandomDancePos == CurrntPos)
         {
-            RandomDancePos = Random.Range(0,4);
+            RandomDancePos = Random.Range(0, 4);
             Debug.Log("SameNumber");
         }
-        switch(RandomDancePos)
+        switch (RandomDancePos)
         {
-            case 0: dance = Dance.Pos01;
+            case 0:
+                dance = Dance.Pos01;
                 break;
             case 1:
                 dance = Dance.Pos02;
@@ -225,7 +234,7 @@ public class GM_PosManager : MonoBehaviour
                 dance = Dance.Pos04;
                 break;
         }
-        return dance;   
+        return dance;
     }
 
     public void GetScore()
@@ -238,66 +247,99 @@ public class GM_PosManager : MonoBehaviour
 
     public void Update()
     {
-        DancsPosActive();
-        AllPlaced();
-        if(IsSetPos)
+        if (BlazePoseSample.instance.gameMode != BlazePoseSample.GameMode.NotStarted)
         {
-            Pos01.GetComponent<SpriteRenderer>().color = collectColor;
-            
-            Pos02.GetComponent<SpriteRenderer>().color = collectColor;
-            Pos03.GetComponent<SpriteRenderer>().color = collectColor;
-            Pos04.GetComponent<SpriteRenderer>().color = collectColor;
-        }
-        else
-        {
-            Pos01.GetComponent<SpriteRenderer>().color = failColor;
-            Pos02.GetComponent<SpriteRenderer>().color = failColor;
-            Pos03.GetComponent<SpriteRenderer>().color = failColor;
-            Pos04.GetComponent<SpriteRenderer>().color = failColor;
-        }
-        if (IsSetPos == true && waitTimer < 0 && !isBunningTime)
-        {
-            waitTimer = 2.0f;
-            timer = 3.0f;
-            GetScore();
 
-            //if Combo.equal(3)
-            if (comboCounter == 3)
+            DancsPosActive();
+            AllPlaced();
+
+            if (IsSetPos)
             {
-                isBunningTime = true;
-                burnning.gameObject.SetActive(true);
+                if(!bCheck)
+                {
+                    checktime = timer;
+                    reactiontimerText.text = "Reaction Time : "+checktime.ToString();
+                    bCheck = true;
+                }
+                Pos01.GetComponent<SpriteRenderer>().color = collectColor;
+                Pos02.GetComponent<SpriteRenderer>().color = collectColor;
+                Pos03.GetComponent<SpriteRenderer>().color = collectColor;
+                Pos04.GetComponent<SpriteRenderer>().color = collectColor;
+            }
+            else
+            {
+                bCheck = false;
+                Pos01.GetComponent<SpriteRenderer>().color = failColor;
+                Pos02.GetComponent<SpriteRenderer>().color = failColor;
+                Pos03.GetComponent<SpriteRenderer>().color = failColor;
+                Pos04.GetComponent<SpriteRenderer>().color = failColor;
+            }
+            if (IsSetPos == true && waitTimer < 0 && !isBunningTime)
+            {
+                waitTimer = 2.0f;
+                timer = 3.0f;
+                GetScore();
+
+                //if Combo.equal(3)
+                if (comboCounter == 3)
+                {
+                    isBunningTime = true;
+                    burnning.gameObject.SetActive(true);
+                    waitTimer = 1.0f;
+                    timer = 1.0f;
+                }
+                RandomPos();
+            }
+            else if (IsSetPos == true && waitTimer < 0 && isBunningTime)
+            {
                 waitTimer = 1.0f;
                 timer = 1.0f;
+                GetScore();
+                RandomPos();
             }
-            RandomPos();
+            // Didn't get Score
+            if (IsSetPos == false && waitTimer < 0)
+            {
+                waitTimer = 2.0f;
+                timer = 3.0f;
+                RandomPos();
+                isCombo = false;
+                comboCounter = 0;
+                isBunningTime = false;
+                burnning.gameObject.SetActive(false);
+            }
+            timer -= Time.deltaTime;
+            waitTimer -= Time.deltaTime;
+            playTimer -= Time.deltaTime;
+            if (playTimer < 0)
+            {
+                Pos01.SetActive(false);
+                Pos02.SetActive(false);
+                Pos03.SetActive(false);
+                Pos04.SetActive(false);
+
+                gameEndPanel.SetActive(true);
+                maxScore.text = score.ToString();
+                Time.timeScale = 0.0f;
+            }
+            //timerText.text = timer.ToString();
+            waitTimerText.text = waitTimer.ToString();
+            playTimerText.text = playTimer.ToString();
         }
-        else if (IsSetPos == true && waitTimer < 0 && isBunningTime)
-        {
-            waitTimer = 1.0f;
-            timer = 1.0f;
-            GetScore();
-            RandomPos();
-        }
-        // Didn't get Score
-        if (IsSetPos == false && waitTimer < 0)
-        {
-            waitTimer = 2.0f;
-            timer = 3.0f;
-            RandomPos();
-            isCombo = false;
-            comboCounter = 0;
-            isBunningTime = false;
-            burnning.gameObject.SetActive(false);
-        }
-        timer -= Time.deltaTime;
-        waitTimer -= Time.deltaTime;
-        playTimer -= Time.deltaTime;
-        if (playTimer < 0)
-        {
-            Time.timeScale = 0.0f;
-        }
-        //timerText.text = timer.ToString();
-        waitTimerText.text = waitTimer.ToString();
-        playTimerText.text = playTimer.ToString();
+    }
+
+    public void GameStartButtonPress()
+    {
+        BlazePoseSample.instance.gameMode = BlazePoseSample.GameMode.BodyTracking;
+        gamePanel.SetActive(false);
+        Time.timeScale = 1.0f;
+    }
+    public void GameEndButtonPress()
+    {
+        
+        SceneManager.LoadScene("Scene/01_SceneSelector");
+        Time.timeScale = 1.0f;
+        Destroy(BlazePoseSample.instance.gameObject);
+        Destroy(this.gameObject);
     }
 }

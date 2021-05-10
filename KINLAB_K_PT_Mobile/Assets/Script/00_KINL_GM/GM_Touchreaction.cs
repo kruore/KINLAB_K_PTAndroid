@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GM_Touchreaction : MonoBehaviour
 {
@@ -13,7 +14,17 @@ public class GM_Touchreaction : MonoBehaviour
     public int comboCounter;
     public bool isCombo;
 
+    public Text reactionTimerText;
+    public float checktime = 0.0f;
+
+    public Text MaxScoreText;
     public Text scoreText;
+
+    [Header("Panel")]
+    public GameObject gamePanel;
+    public GameObject gameEndPanel;
+    public bool bCheck = false;
+    public int MaxScore=0;
 
     public Text restTimeText;
     public float restTime;
@@ -47,14 +58,17 @@ public class GM_Touchreaction : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        StopTimer = 100;
-        restTime = 100.0f;
+        StopTimer = 10;
+        restTime = 10.0f;
         lineColor = new Image[linecontainer.transform.childCount];
         for (int i = 0; i < linecontainer.transform.childCount; i++)
         {
             lineColor[i] = linecontainer.gameObject.transform.GetChild(i).GetComponent<Image>();
         }
-        NewTargetPosition();
+        if (BlazePoseSample.instance.gameMode == BlazePoseSample.GameMode.NotStarted)
+        {
+            Time.timeScale = 0;
+        }
     }
     public void GetScore()
     {
@@ -83,17 +97,60 @@ public class GM_Touchreaction : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        restTime -= Time.deltaTime;
-        StopTimer = (int)restTime;
-        restTimeText.text = "Rest Time : " + StopTimer.ToString();
-        if (isTouch)
+        if (BlazePoseSample.instance.gameMode != BlazePoseSample.GameMode.NotStarted)
         {
-            NewTargetPosition();
-            GetScore();
+            Time.timeScale = 1;
+            checktime += Time.deltaTime;
+            restTime -= Time.deltaTime;
+            StopTimer = (int)restTime;
+            restTimeText.text = "Rest Time : " + StopTimer.ToString();
+            if (isTouch)
+            {
+                if (!bCheck)
+                {
+                    //reactionTimerText;
+                    reactionTimerText.text = "Reaction Time : " + checktime.ToString();
+                    bCheck = true;
+                    checktime = 0;
+                }
+                NewTargetPosition();
+                GetScore();
+            }
+            else
+            {
+                bCheck = false;
+            }
+            if (StopTimer == 0)
+            {
+                Time.timeScale = 0;
+                try
+                {
+                    GameObject.Find("TouchTarget(Clone)").SetActive(false);
+                    GameObject.Find("ScorePref(Clone)").SetActive(false);
+                }
+                catch(System.NullReferenceException e)
+                {
+                    Debug.Log("¾øÀ½");
+                }
+                gameEndPanel.SetActive(true);
+                MaxScore = score;
+                MaxScoreText.text = MaxScore.ToString();
+            }
         }
-        if (StopTimer == 0)
-        {
-            Time.timeScale = 0;
-        }
+    }
+
+    public void GameStartButtonPress()
+    {
+        BlazePoseSample.instance.gameMode = BlazePoseSample.GameMode.TouchReaction;
+        gamePanel.SetActive(false);
+        Time.timeScale = 1.0f;
+        NewTargetPosition();
+    }
+    public void GameEndButtonPress()
+    {
+        SceneManager.LoadScene("Scene/01_SceneSelector");
+        Time.timeScale = 1.0f;
+        Destroy(BlazePoseSample.instance.gameObject);
+        Destroy(this.gameObject);
     }
 }

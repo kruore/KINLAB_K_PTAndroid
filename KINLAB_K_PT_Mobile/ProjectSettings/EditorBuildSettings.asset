@@ -5,16 +5,19 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scene/00_LoadScene.unity
     guid: dad66fa30e95dd7419442c7dc3f283e1
-  - enabled: 0
+  - enabled: 1
+    path: Assets/Scene/01_SceneSelector.unity
+    guid: 10e182c3188891b4e92a88252381c59d
+  - enabled: 1
     path: Assets/MLKIT/BlazePose/BlazePoseUpperBody.unity
     guid: d950d4d838fef4617a05bdf13bad7f89
-  - enabled: 0
+  - enabled: 1
     path: Assets/MLKIT/BlazePose/BlazePoseFullBody.unity
     guid: 3abf2ff7d3acd4eda8d5014c1830c433
-  - enabled: 0
+  - enabled: 1
     path: Assets/MLKIT/BlazePose/TouchObject.unity
     guid: 267320b4fdaa7c3498f5bc11372533cf
   - enabled: 1

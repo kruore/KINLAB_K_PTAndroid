@@ -24,6 +24,8 @@ public sealed class BlazePoseSample : MonoBehaviour
     {
         BodyTracking,
         TouchReaction,
+        NotStarted,
+        GameEnd
     }
 
     public static BlazePoseSample instance;
@@ -31,7 +33,7 @@ public sealed class BlazePoseSample : MonoBehaviour
     [SerializeField, FilePopup("*.tflite")] string poseDetectionModelFile = "coco_ssd_mobilenet_quant.tflite";
     [SerializeField, FilePopup("*.tflite")] string poseLandmarkModelFile = "coco_ssd_mobilenet_quant.tflite";
     [SerializeField] Mode mode = Mode.UpperBody;
-    [SerializeField] public GameMode gameMode = GameMode.BodyTracking;
+    [SerializeField] public GameMode gameMode;
     [SerializeField] RawImage cameraView = null;
     [SerializeField] RawImage debugView = null;
     [SerializeField] bool useLandmarkFilter = true;
@@ -114,6 +116,8 @@ public sealed class BlazePoseSample : MonoBehaviour
                 poseDetect = new PoseDetectUpperBody(detectionPath);
                 poseLandmark = new PoseLandmarkDetectUpperBody(landmarkPath);
                 webcamTexture = new WebCamTexture(camName, 2280, 1080, 30);
+                Screen.orientation = ScreenOrientation.LandscapeRight;
+                Screen.SetResolution(1080, 2280, true);
                 break;
             case Mode.FullBody:
                 poseDetect = new PoseDetectFullBody(detectionPath);
@@ -230,6 +234,12 @@ public sealed class BlazePoseSample : MonoBehaviour
                         }
                     }
                 }
+                break;
+            case GameMode.NotStarted:
+                Time.timeScale = 0;
+                break;
+            case GameMode.GameEnd:
+                Time.timeScale = 0;
                 break;
             default:
                 throw new System.NotSupportedException($"Mode: {gameMode} is not supported");
@@ -389,6 +399,12 @@ public sealed class BlazePoseSample : MonoBehaviour
                     ColorLineDrow_DebugerToggle.isOn = false;
                     ColorLineDrow_DebugMode = false;
                 }
+                break;
+            case GameMode.NotStarted:
+                Time.timeScale = 0;
+                break;
+            case GameMode.GameEnd:
+                Time.timeScale = 0;
                 break;
         }
      
