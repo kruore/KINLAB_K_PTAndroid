@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "896113822867",
+    "firebase_url": "https://kinlab-k-pt.firebaseio.com",
+    "project_id": "kinlab-k-pt",
+    "storage_bucket": "kinlab-k-pt.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:896113822867:android:a5a8a7eba995981e29d166",
+        "android_client_info": {
+          "package_name": "com.KINLAB.KINLKPT"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "896113822867-lo1g7ueck1h0dlce2auqkej1hf8n4lh3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.KINLAB.KINLKPT",
+            "certificate_hash": "d80a6ff65ccabe6f4fc3df19b9a5e4212d1b6d65"
+          }
+        },
+        {
+          "client_id": "896113822867-ms7kkqclg0iovin5e5nirj7ui2vahg9l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOujz-1wIfT76yIujuWpnSTLutkDA9n0s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "896113822867-ms7kkqclg0iovin5e5nirj7ui2vahg9l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

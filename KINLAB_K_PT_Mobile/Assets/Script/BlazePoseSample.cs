@@ -24,7 +24,9 @@ public sealed class BlazePoseSample : MonoBehaviour
     [SerializeField, FilePopup("*.tflite")] string poseLandmarkModelFile = "coco_ssd_mobilenet_quant.tflite";
     [SerializeField] Mode mode = Mode.UpperBody;
     [SerializeField] RawImage cameraView = null;
+   // [SerializeField] RawImage cameraView2 = null;
     [SerializeField] RawImage debugView = null;
+
     [SerializeField] bool useLandmarkFilter = true;
     [SerializeField, Range(2f, 30f)] float filterVelocityScale = 10;
     [SerializeField] bool runBackground;
@@ -101,8 +103,10 @@ public sealed class BlazePoseSample : MonoBehaviour
         //    isFrontFacing = false,
         //    kind = WebCamKind.WideAngle,
         //});
-        webcamTexture = new WebCamTexture(camName, 1280, 720, 30);
+        webcamTexture = new WebCamTexture(camName, 1170 , 2532, 30);
         cameraView.texture = webcamTexture;
+       // cameraView2.texture = webcamTexture;
+        cameraView.gameObject.transform.localScale = new Vector3(-1.0f, 1.0f, 1.0f);
         webcamTexture.Play();
         Debug.Log($"Starting camera: {camName}");
 
@@ -142,7 +146,7 @@ public sealed class BlazePoseSample : MonoBehaviour
         }
 
         if (poseResult == null || poseResult.score < 0f) return;
-        DrawFrame(poseResult);
+       // DrawFrame(poseResult);
 
         if (landmarkResult == null || landmarkResult.score < 0.2f) return;
         DrawCropMatrix(poseLandmark.CropMatrix);
@@ -176,8 +180,8 @@ public sealed class BlazePoseSample : MonoBehaviour
             * matrix.inverse;
         Vector3 a = MathTF.LerpUnclamped(min, max, mtx.MultiplyPoint3x4(new Vector3(0, 0, 0)));
         Vector3 b = MathTF.LerpUnclamped(min, max, mtx.MultiplyPoint3x4(new Vector3(1, 0, 0)));
-        Vector3 c = MathTF.LerpUnclamped(min, max, mtx.MultiplyPoint3x4(new Vector3(1, 1, 0)));
-        Vector3 d = MathTF.LerpUnclamped(min, max, mtx.MultiplyPoint3x4(new Vector3(0, 1, 0)));
+        Vector3 c = MathTF.LerpUnclamped(min, max, mtx.MultiplyPoint3x4(new Vector3(1, 2, 0)));
+        Vector3 d = MathTF.LerpUnclamped(min, max, mtx.MultiplyPoint3x4(new Vector3(0, 2, 0)));
 
         draw.Quad(a, b, c, d, 0.02f);
         draw.Apply();
@@ -230,8 +234,8 @@ public sealed class BlazePoseSample : MonoBehaviour
     void Invoke()
     {
         poseDetect.Invoke(webcamTexture);
-        cameraView.material = poseDetect.transformMat;
-        cameraView.rectTransform.GetWorldCorners(rtCorners);
+      //  cameraView.material = poseDetect.transformMat;
+      //  cameraView.rectTransform.GetWorldCorners(rtCorners);
 
         poseResult = poseDetect.GetResults(0.7f, 0.3f);
         if (poseResult.score < 0) return;
@@ -262,8 +266,8 @@ public sealed class BlazePoseSample : MonoBehaviour
         // Back to the update timing from now on 
         if (cameraView != null)
         {
-            cameraView.material = poseDetect.transformMat;
-            cameraView.rectTransform.GetWorldCorners(rtCorners);
+           // cameraView.material = poseDetect.transformMat;
+            //cameraView.rectTransform.GetWorldCorners(rtCorners);
         }
         if (debugView != null)
         {

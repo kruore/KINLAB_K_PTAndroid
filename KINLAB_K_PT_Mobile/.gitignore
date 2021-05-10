@@ -62,5 +62,7 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
-
+*.a
+*.tflite
+IOS/Frameworks/AgoraEngine/Frameworks/AgoraEngine/Plugins/iOS/AgroaRtcEngineKit.framework
 

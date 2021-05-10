@@ -1,0 +1,11 @@
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '11.0'
+
+target 'UnityFramework' do
+  pod 'Firebase/Auth', '7.5.0'
+  pod 'Firebase/Core', '7.5.0'
+  pod 'GoogleSignIn', '>= 4.0.2'
+end
+target 'Unity-iPhone' do
+end
+use_frameworks!
